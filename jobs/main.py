@@ -28,6 +28,7 @@ def get_next_time():
     start_time += timedelta(seconds=random.randint(30, 60))
     return start_time
 
+
 def simulate_vehicle_movement():
     global start_location
     # Towards Birmingham
@@ -104,21 +105,22 @@ def json_serializer(obj):
         return str(obj)
     raise TypeError("Obj of type is not JSON serializable",obj.__class__.__name__)
 
-
-def produce_to_kafka(producer,topic,data):
+def produce_to_kafka(producer, topic, data):
     producer.produce(
         topic,
         key=str(data['id']),
         value=json.dumps(data,default=json_serializer).encode('utf-8'),
         on_delivery=delivery_report
     )
-    
+
+
+
     
 def delivery_report(err,msg):
     if err is not None:
         print("Failed",err)
     else:
-        print("Success")   
+        print("Success",msg)   
 
 
 
@@ -130,19 +132,24 @@ def simulate_journey(producer, deviceId):
         traffic_cam_data=generate_traffic_camera_data(deviceId,vehicle_data['timestamp'],'Nikon-cam123',vehicle_data['location'])
         weatherdata=generate_weather_data(deviceId,vehicle_data['timestamp'],vehicle_data['location'])
         emergency_incident_data=generate_emergency_incident_data(deviceId,vehicle_data['timestamp'],vehicle_data['location'])
-        
+        if(vehicle_data['location'][0]>=BIRMINGHAM_COORDINATES['latitude'] and
+           vehicle_data['location'][0]<=BIRMINGHAM_COORDINATES['longitude']):
+            print("Arrived at BIRMINGHAM")
+            break
         produce_to_kafka(producer,VEHICLE_TOPIC,vehicle_data)
         produce_to_kafka(producer,GPS_TOPIC,gps_data)
         produce_to_kafka(producer,TRAFFIC_TOPIC,traffic_cam_data)
         produce_to_kafka(producer,WEATHER_TOPIC,weatherdata)
         produce_to_kafka(producer,EMERGENCY_TOPIC,emergency_incident_data)
-        break
+        # time.sleep(5)
+        
 
 def getProducer():
     producer_config = {
         'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
         'error_cb': lambda err: print('Kafka error:', err)
     }
+
     producer = SerializingProducer(producer_config)
     try:
         simulate_journey(producer, 'abc started')
@@ -150,7 +157,7 @@ def getProducer():
     except KeyboardInterrupt:
         print('Simulation ended by the user')
     except Exception as e:
-        print('Error:', e)
+        print(f'Error: {e}')
     finally:
         # Ensure all messages are flushed before terminating
         producer.flush(timeout=30)  # Wait up to 30 seconds for messages to be sent
@@ -158,3 +165,5 @@ def getProducer():
 
 if __name__ == '__main__':
     getProducer()
+
+
