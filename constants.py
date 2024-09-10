@@ -1,0 +1,16 @@
+import os
+
+
+BIRMINGHAM_COORDINATES = {'latitude': 52.4862, 'longitude': -1.8904}
+start_location = {'latitude': 51.5074, 'longitude': -0.1278}  # Starting point (London)
+LATITUDE_INCREMENT = (BIRMINGHAM_COORDINATES['latitude'] - start_location['latitude']) / 100
+LONGITUDE_INCREMENT = (BIRMINGHAM_COORDINATES['longitude'] - start_location['longitude']) / 100
+# LATITUDE_INCREMENT = 0.0001
+# LONGITUDE_INCREMENT = 0.0001
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'broker:29093')
+# KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9093')
+VEHICLE_TOPIC = os.getenv('VEHICLE_TOPIC', 'VEHICLE_TOPIC')
+GPS_TOPIC = os.getenv('GPS_TOPIC', 'GPS_TOPIC')
+TRAFFIC_TOPIC = os.getenv('TRAFFIC_TOPIC', 'TRAFFIC_TOPIC')
+WEATHER_TOPIC = os.getenv('WEATHER_TOPIC', 'WEATHER_TOPIC')
+EMERGENCY_TOPIC = os.getenv('EMERGENCY_TOPIC', 'EMERGENCY_TOPIC')

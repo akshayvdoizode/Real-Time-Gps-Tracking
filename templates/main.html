@@ -1,0 +1,90 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([51.5074, -0.1278], 13); // Default to London coordinates
+        // var map1 = L.map('map').setView([51.5074, -0.1278], 13); // Default to London coordinates
+        // BIRMINGHAM_COORDINATES = {'latitude': 52.4862, 'longitude': -1.8904}
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var marker = L.marker([51.5074, -0.1278]).addTo(map); // Default marker at London
+
+        // Establish SSE connection
+        var eventSource = new EventSource('https://expert-system-4vw955qq57hjvv6-5000.app.github.dev/events');
+
+        eventSource.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            var location = data.location;
+
+            // Update marker position
+            marker.setLatLng([location.latitude, location.longitude]);
+            marker_2.setLatLng([location.latitude, location.longitude]);
+
+            // Optionally adjust the map view
+            map.setView([location.latitude, location.longitude]);
+        };
+    </script>
+
+    {{content}}  
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map, defaulting to London
+        var map = L.map('map').setView([51.5074, -0.1278], 13); 
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Marker for London (will be moved with real-time data)
+        var vehicleMarker = L.marker([51.5074, -0.1278]).addTo(map); 
+
+        // Add marker for Birmingham (static)
+        var birminghamMarker = L.marker([52.4862, -1.8904]).addTo(map).bindPopup('Birmingham');
+
+        // Establish SSE connection for real-time updates
+        var eventSource = new EventSource('https://expert-system-4vw955qq57hjvv6-5000.app.github.dev/events');
+
+        eventSource.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            var location = data.location;
+
+            // Update vehicle marker's position based on Kafka-produced location data
+            vehicleMarker.setLatLng([location.latitude, location.longitude]);
+
+            // Optionally adjust the map view to follow the vehicle
+            map.setView([location.latitude, location.longitude]);
+        };
+    </script>
+</body>
+</html>
